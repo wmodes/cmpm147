@@ -17,11 +17,13 @@
 .two-column {
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
   gap: 1rem;
 }
 
 .two-column>*:nth-child(1) {
   flex: 0.9;
+  min-width: 300px;
 }
 
 .two-column>*:nth-child(2) {
