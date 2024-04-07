@@ -6,9 +6,7 @@
 // Note that p5.js looks for a file called sketch.js
 
 // Constants - User-servicable parts
-// In a longer project I like to put these in a separate file
-const VALUE1 = 1;
-const VALUE2 = 2;
+
 
 // Globals
 let myInstance;
@@ -19,9 +17,9 @@ const angleY = 0;
 const angleX = 3.14;
 const angleZ = 0;
 
-const xRotMax = 0.003;
-const yRotMax = 0.15;
-const zRotMax = 0.003;
+const xRotMax = 0.005;
+const yRotMax = 0.2;
+const zRotMax = 0.0055;
 
 const numTeapots = 3;
 let teapotObj;
