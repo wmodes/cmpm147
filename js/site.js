@@ -16,28 +16,28 @@ $(document).ready(function() {
     // return results;
   }
 
-  function main() {
-    console.log("Main function started.");
-    // the code that makes everything happen
-
-    // Put the canvas in fullscreen mode
-    $('#fullscreen').click(function() {
-      console.log("Going fullscreen.")
-      let fs = fullscreen();
-      fullscreen(!fs);
-    });
-
-    // Listen for fullscreen change events
-    $(document).on('fullscreenchange webkitfullscreenchange mozfullscreenchange MSFullscreenChange', function() {
-      if (!fullscreen()) {
-        // User has exited fullscreen mode
-        $('body').removeClass('is-fullscreen');
-      } else {
-        // User has entered fullscreen mode
-        $('body').addClass('is-fullscreen');
+  $('#fullscreen-button').click(function() {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch((e) => {
+        console.error(e);
+      });
+      console.log("Going fullscreen.");
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
       }
-    });
-  }
+    }
+  });
+  
+  $(document).on('fullscreenchange', function() {
+    if (document.fullscreenElement) {
+      console.log("Entered fullscreen mode");
+      $('body').addClass('is-fullscreen');
+    } else {
+      console.log("Exited fullscreen mode");
+      $('body').removeClass('is-fullscreen');
+    }
+  });
 
 
   // let's get this party started
