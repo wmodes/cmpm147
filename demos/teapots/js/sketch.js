@@ -13,57 +13,81 @@ const VALUE2 = 2;
 // Globals
 let myInstance;
 let canvasContainer;
-var centerHorz, centerVert;
+let centerHorz, centerVert;
+
+const angleY = 0;
+const angleX = 3.14;
+const angleZ = 0;
+
+const xRotMax = 0.003;
+const yRotMax = 0.15;
+const zRotMax = 0.003;
+
+const numTeapots = 3;
+let teapotObj;
+let teapots = [];
+
+function modelLoaded() {
+  console.log('Teapot model loaded successfully.');
+}
+
+function modelError(error) {
+  console.error('Error loading teapot model:', error);
+}
+
+function preload() {
+  teapotObj = loadModel('assets/teapot.obj', modelLoaded, modelError);
+}
+
+function windowResized() {
+  resizeScreen();
+}
 
 function resizeScreen() {
   centerHorz = canvasContainer.width() / 2; // Adjusted for drawing logic
   centerVert = canvasContainer.height() / 2; // Adjusted for drawing logic
   console.log("Resizing...");
   resizeCanvas(canvasContainer.width(), canvasContainer.height());
-  // redrawCanvas(); // Redraw everything based on new size
+  redrawCanvas(); // Redraw everything based on new size
 }
 
-let angleY = 0;
-let angleX = 3.14;
-let angleZ = 0;
-
-let xRotMax = 0.003;
-let yRotMax = 0.15;
-let zRotMax = 0.003;
-
-let n = 4;
-let teapots = [];
-
-function preload() {
-  teapotObj = loadModel('../assets/teapot.obj');
-}
-
-function setup() {
-  createCanvas(windowWidth, windowHeight, WEBGL);
-  let posXScale = width/100;
-  let posYScale = height/100;
-
-  // Create objects
-  for (i=0; i<n; i++) {
-    let thisPos = createVector(random(-posXScale,posXScale),
-                               random(-posYScale,posYScale),
-                               random(-posXScale,posXScale));
-    let thisDelta = createVector(random(xRotMax/2,xRotMax), 
-                                 random(yRotMax/2,yRotMax), 
-                                 random(zRotMax/2,zRotMax));
+function redrawCanvas() {
+  // Adjust canvas size to container's current dimensions
+  resizeCanvas(canvasContainer.width(), canvasContainer.height());
+  
+  // Recalculate scale factors based on new canvas size
+  const posXScale = canvasContainer.width() / 100;
+  const posYScale = canvasContainer.height() / 100;
+  
+  // Recreate objects with new position scales if their positioning is dependent on canvas size
+  teapots = []; // Reset the array if you're going to repopulate it
+  for (let i = 0; i < numTeapots; i++) {
+    const thisPos = createVector(random(-posXScale, posXScale),
+                               random(-posYScale, posYScale),
+                               random(-posXScale, posXScale));
+    const thisDelta = createVector(random(xRotMax / 2, xRotMax), 
+                                 random(yRotMax / 2, yRotMax), 
+                                 random(zRotMax / 2, zRotMax));
     teapots[i] = new Thing(teapotObj, 30, thisPos, thisDelta);
   }
+  
+  // Optionally, reapply global settings that might be affected by resize
+  // (e.g., lights, camera positions, global scale)
+}
+
+
+function setup() {
+  // place our canvas, making it fit our container
+  canvasContainer = $("#canvas-container");
+  const canvas = createCanvas(canvasContainer.width(), canvasContainer.height(), WEBGL);
+  canvas.parent("canvas-container");
+
+  // setup all the params for the teapots
+  redrawCanvas();
 }
 
 function draw() {
-  // Set the background color
-  background(0);
-  
-  push();
-  noStroke();
-  translate(0,0,-1000);
-  plane(width * 2.3, height * 2.3);
-  pop();
+  clear();
   
   // scale everything
   scale(25);
@@ -74,7 +98,7 @@ function draw() {
   noStroke();
   
   
-  for (i=0; i<n; i++) {
+  for (let i=0; i<numTeapots; i++) {
     push();
     teapots[i].rotate();
     teapots[i].display();
