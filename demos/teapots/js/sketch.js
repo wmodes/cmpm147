@@ -18,7 +18,7 @@ const angleX = 3.14;
 const angleZ = 0;
 
 const xRotMax = 0.005;
-const yRotMax = 0.2;
+const yRotMax = 0.3;
 const zRotMax = 0.0055;
 
 const numTeapots = 3;
