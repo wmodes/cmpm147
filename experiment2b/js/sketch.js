@@ -18,26 +18,35 @@ const HORIZON_COLOR_2 = "#602141";
 const TERRAIN_STEP = 5; 
 const TERRAIN_FREQ_FACTOR = 0.01;
 const TERRAIN_AMPLITUDE_FACTOR = 0.25;
-const TERRAIN_BASE_COLOR = "#4A1A34";
+const TERRAIN_BASE_COLOR = "#3A1324";
 
 // mesas
 const MESA_HEIGHT_FACTOR = 1.5;
-const MESA_TOP_AMPLITUDE_FACTOR = 0.25; 
+const MESA_TOP_AMPLITUDE_FACTOR = 0.5; 
 const MESA_VARIATION = 20;
 const MESA_START_FACTOR = 0.4;  // the percentage of the terrain above which mesas start
-const MESA_BASE_COLOR = "#4A1A34";
+const MESA_BASE_COLOR = "#3A1324";
 const MESA_COLOR_1 = "#14020D";
 
 // sky
-const SKY_BASE_COLOR = "#FB610F";
-const SKY_COLOR_1 = "#FFEB01";
-const SKY_COLOR_2 = "#FC420F";
-const SKY_COLOR_3 = "#89A3BC";
+const SKY_SCALE_X = 0.5; // approx 1/2 the width of the canvas
+const SKY_SCALE_Y = 0.1; // approx 1/10 the height of the canvas
+const SKY_BASE_COLOR = "#89A3BC"; // Yellow white
+const SKY_COLOR_1 = "#89A3BC"; // Light blue
+const SKY_COLOR_2 = "#8B5061"; // Purple
+const SKY_COLOR_3 = "#FC420F"; // Red
+const SKY_COLOR_4 = "#FB610F"; // Orange
+const SKY_COLOR_5 = "#FFEB01"; // Yellow
+const SKY_COLOR_6 = "#FFFEED"; // Yellow white
+const SKY_GROUP_1 = [SKY_COLOR_1, SKY_COLOR_2, SKY_COLOR_3, SKY_COLOR_4];
+const SKY_GROUP_2 = [SKY_COLOR_6, SKY_COLOR_5, SKY_COLOR_4, SKY_COLOR_3];
 
 // Globals
 let myInstance;
 let canvasContainer;
 var centerHorz, centerVert;
+let zOffset = 0; // For animation over time
+let baseOffsets = [];
 
 
 function resizeScreen() {
@@ -62,6 +71,11 @@ function setup() {
   resizeScreen();
 
   noiseSeed(millis());
+
+  // Initialize unique noise offsets for each oval
+  for (let i = 0; i < 10; i++) {
+    baseOffsets.push(random(1000)); // These remain constant throughout execution
+  }
 }
 
 // draw() function is called repeatedly, it's the main animation loop
@@ -168,29 +182,42 @@ function draw() {
 }
 
 function drawSky() {
-  background(SKY_BASE_COLOR); // Base color
+  const BASE_COLOR = SKY_BASE_COLOR;
+  const NUM_OVALS = 30;
+  const OVAL_Y_SCALE = SKY_SCALE_Y * height;
+  const OVAL_X_SCALE = OVAL_Y_SCALE * 40;
+  const NOISE_SCALE_POSITION = 0.05;
+  const NOISE_SCALE_Y_OFFSET = 0.5;
+  const NOISE_SCALE_SIZE = 0.3;
+  const SIZE_MULTIPLIER_BASE = 0.5;
+  const SIZE_MULTIPLIER_INCREMENT = 1.25;
+  const Z_OFFSET_INCREMENT = 0.0003;
 
-  let colors = [color(SKY_COLOR_1), color(SKY_COLOR_2), color(SKY_COLOR_3)];
-  let maxY = height * 0.6; // Maximum y to start streaks
-  let minY = 0; // Minimum y to start streaks
-  let maxStreakHeight = 20; // Maximum height of a streak
+  background(BASE_COLOR);
 
-  for (let y = minY; y < maxY; y += noise(y * 0.1) * maxStreakHeight) {
-    let streakLength = noise(y * 0.05) * width; // Variable streak length
-    let streakHeight = noise(y * 0.1) * maxStreakHeight; // Variable streak height
-    let startX = noise(y * 0.1) * (width - streakLength); // Start position varies
+  for (let i = 0; i < NUM_OVALS; i++) {
+    // Allow for full coverage by scaling noise output to slightly beyond canvas dimensions
+    // let x = (noise(baseOffsets[i] * NOISE_SCALE_POSITION, zOffset) * (width + 2 * OVAL_X_SCALE)) - OVAL_X_SCALE;
+    // let y = (noise(baseOffsets[i] * NOISE_SCALE_POSITION + NOISE_SCALE_Y_OFFSET, zOffset) * (height + 2 * OVAL_Y_SCALE)) - OVAL_Y_SCALE;
+    let x = (noise(baseOffsets[i] * NOISE_SCALE_POSITION, zOffset) * 1.5 - 0.25) * width;
+    let y = (noise(baseOffsets[i] * NOISE_SCALE_POSITION + NOISE_SCALE_Y_OFFSET, zOffset) * 1.5 - 0.25) * height;
+    
+    let sizeFactor = noise(baseOffsets[i] * NOISE_SCALE_POSITION + NOISE_SCALE_SIZE, zOffset);
+    let ellipseWidth = OVAL_X_SCALE * sizeFactor;
+    let ellipseHeight = OVAL_Y_SCALE * sizeFactor;
 
-    // Determine color based on height
-    let colorIndex = floor(noise(y * 0.1) * colors.length);
-    let c1 = colors[colorIndex % colors.length];
-    let c2 = colors[(colorIndex + 1) % colors.length];
-    let interp = noise(y * 0.1) * (colors.length - 1) - floor(noise(y * 0.1) * (colors.length - 1));
-    let streakColor = lerpColor(c1, c2, interp);
+    let colorGroup = i % 2 === 0 ? SKY_GROUP_1 : SKY_GROUP_2;
 
-    fill(streakColor);
-    noStroke();
-    rect(startX, y, streakLength, streakHeight);
-  }
+    for (let j = colorGroup.length - 1; j >= 0; j--) {
+        let col = color(colorGroup[j]);
+
+        fill(col);
+        noStroke();
+        ellipse(x, y, ellipseWidth * (SIZE_MULTIPLIER_BASE + SIZE_MULTIPLIER_INCREMENT * j), ellipseHeight * (SIZE_MULTIPLIER_BASE + SIZE_MULTIPLIER_INCREMENT * j));
+    }
+}
+
+zOffset += Z_OFFSET_INCREMENT;
 }
 
 
