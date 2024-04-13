@@ -23,12 +23,16 @@ const TERRAIN_BASE_COLOR = "#4A1A34";
 // mesas
 const MESA_HEIGHT_FACTOR = 1.5;
 const MESA_TOP_AMPLITUDE_FACTOR = 0.25; 
+const MESA_VARIATION = 20;
 const MESA_START_FACTOR = 0.4;  // the percentage of the terrain above which mesas start
 const MESA_BASE_COLOR = "#4A1A34";
 const MESA_COLOR_1 = "#14020D";
 
 // sky
-const SKY_BASE_COLOR = "#FED503";
+const SKY_BASE_COLOR = "#FB610F";
+const SKY_COLOR_1 = "#FFEB01";
+const SKY_COLOR_2 = "#FC420F";
+const SKY_COLOR_3 = "#89A3BC";
 
 // Globals
 let myInstance;
@@ -62,8 +66,7 @@ function setup() {
 
 // draw() function is called repeatedly, it's the main animation loop
 function draw() {
-  background(SKY_BASE_COLOR); // Set background to black
-
+  
   let terrain = [];
   let mesas = [];
   let currentMesa = []; // Temporarily holds vertices of the current mesa
@@ -74,6 +77,7 @@ function draw() {
   let terrainBaseY = height * 2/3 + yNoiseRange;
   let terrainPeakY = height * 2/3 - yNoiseRange;
   let mesaBaseY = terrainPeakY + (terrainBaseY - terrainPeakY) * MESA_START_FACTOR;
+  let localVariation = 0;
 
   // Initialize and check the first point
   let initialNoiseVal = noise(0 * TERRAIN_FREQ_FACTOR);
@@ -90,13 +94,15 @@ function draw() {
 
     // if we are above the dynamicMidpointY, i.e. in the mesa
     if (y < mesaBaseY) {
-      // y = terrainPeakY + (noiseVal * yNoiseRange * MESA_TOP_AMPLITUDE_FACTOR);
+      y = terrainPeakY + (noiseVal * yNoiseRange * MESA_TOP_AMPLITUDE_FACTOR) + localVariation;
       // flatten the top of the mesa
       // y = y * MESA_TOP_AMPLITUDE_FACTOR;
-      // if we are entering a mesa
+      // if we are in a mesa
       if (!inMesa) {
         inMesa = true;
-        mesaHeight = y; // Reset minimum Y for new mesa
+        let noiseScale = 0.05; // Adjust scale to get more or less frequent changes
+        localVariation = noise(x * noiseScale) * 2 * MESA_VARIATION - MESA_VARIATION;
+        // mesaHeight = y; // Reset minimum Y for new mesa
         if (x > 0) { // Ensure we have a point just before the mesa starts
           currentMesa.push([x-5, map(noise((x - 5) * TERRAIN_FREQ_FACTOR), 0, 1, terrainPeakY, terrainBaseY)]);
         }
@@ -109,13 +115,13 @@ function draw() {
     else {
       // if we are exiting a mesa
       if (inMesa) {
-        const mesaLocalHeight = mesaBaseY - mesaHeight;
-        // Set all Y values to the minimum found
-        currentMesa.forEach(point => {
-          const heightOfThisMesa = mesaBaseY - (mesaLocalHeight * MESA_HEIGHT_FACTOR);
-          const localHeightVariation = mesaBaseY - point[1];
-          point[1] = heightOfThisMesa - (localHeightVariation * MESA_TOP_AMPLITUDE_FACTOR);
-        });
+        // const mesaLocalHeight = mesaBaseY - mesaHeight;
+        // // Set all Y values to the minimum found
+        // currentMesa.forEach(point => {
+        //   const heightOfThisMesa = mesaBaseY - (mesaLocalHeight * MESA_HEIGHT_FACTOR);
+        //   const localHeightVariation = mesaBaseY - point[1];
+        //   point[1] = heightOfThisMesa - (localHeightVariation * MESA_TOP_AMPLITUDE_FACTOR);
+        // });
         // set first point of mesa at baseY
         currentMesa.unshift([currentMesa[0][0], mesaBaseY]);
         //set last point of mesa at baseY
@@ -126,6 +132,7 @@ function draw() {
         terrain.push(...currentMesa);
         currentMesa = [];
         inMesa = false;
+        localVariation = 0;
       }
       else {
         terrain.push([x, y]);
@@ -139,6 +146,10 @@ function draw() {
     mesas.push(currentMesa);
     terrain.push(...currentMesa);
   }
+
+  // Draw the sky
+  //
+  drawSky();
 
   // Draw the horizon
   //
@@ -155,6 +166,33 @@ function draw() {
   //
   drawMesas(mesas);
 }
+
+function drawSky() {
+  background(SKY_BASE_COLOR); // Base color
+
+  let colors = [color(SKY_COLOR_1), color(SKY_COLOR_2), color(SKY_COLOR_3)];
+  let maxY = height * 0.6; // Maximum y to start streaks
+  let minY = 0; // Minimum y to start streaks
+  let maxStreakHeight = 20; // Maximum height of a streak
+
+  for (let y = minY; y < maxY; y += noise(y * 0.1) * maxStreakHeight) {
+    let streakLength = noise(y * 0.05) * width; // Variable streak length
+    let streakHeight = noise(y * 0.1) * maxStreakHeight; // Variable streak height
+    let startX = noise(y * 0.1) * (width - streakLength); // Start position varies
+
+    // Determine color based on height
+    let colorIndex = floor(noise(y * 0.1) * colors.length);
+    let c1 = colors[colorIndex % colors.length];
+    let c2 = colors[(colorIndex + 1) % colors.length];
+    let interp = noise(y * 0.1) * (colors.length - 1) - floor(noise(y * 0.1) * (colors.length - 1));
+    let streakColor = lerpColor(c1, c2, interp);
+
+    fill(streakColor);
+    noStroke();
+    rect(startX, y, streakLength, streakHeight);
+  }
+}
+
 
 function drawHorizon(offset, color) {
   fill(color); // Set fill color for the horizon
