@@ -19,6 +19,7 @@ const TERRAIN_STEP = 5;
 const TERRAIN_FREQ_FACTOR = 0.01;
 const TERRAIN_AMPLITUDE_FACTOR = 0.25;
 const TERRAIN_BASE_COLOR = "#3A1324";
+const TERRAIN_COLOR_1 = "#14020D";
 
 // mesas
 const MESA_HEIGHT_FACTOR = 1.5;
@@ -152,8 +153,6 @@ function draw() {
         terrain.push([x, y]);
       }
     }
-
-    
   }
   if (inMesa) {
     currentMesa.push([width, mesaBaseY]);
