@@ -14,6 +14,22 @@
     p3_drawAfter
 */
 
+const blues = [
+  [111,187,239],
+  [90,161,234],
+  [41,123,176],
+  [1,85,134],
+  [1,48,75],
+];
+const greens = [
+  [172,227,131],
+  [143,167,104],
+  [116,127,74],
+  [59,79,48],
+  [78,130,120],
+];
+const colorScale = 0.1;
+
 function p3_preload() {}
 
 function p3_setup() {}
@@ -44,17 +60,30 @@ function p3_tileClicked(i, j) {
 
 function p3_drawBefore() {}
 
+function getNoiseColor(x, y, colorArray) {
+  // Generate a noise value based on x and y
+  let noiseValue = noise(x * colorScale, y * colorScale); 
+
+  // Map the noise value to an index in the color array
+  let index = floor(map(noiseValue, 0, 1, 0, colorArray.length));
+
+  // Retrieve and return the selected color from the array
+  return colorArray[index];
+}
+
 function p3_drawTile(i, j) {
   noStroke();
 
   if (XXH.h32("tile:" + [i, j], worldSeed) % 4 == 0) {
     // fill(240, 200);
     // lake blue
-    fill(156,175,216, 200);
+    const blueColor = getNoiseColor(i, j, blues);
+    fill(...blueColor);
   } else {
     // fill(255, 200);
     // spring green
-    fill(67,113,64, 200);
+    const greenColor = getNoiseColor(i, j, greens);
+    fill(...greenColor);
   }
 
   push();

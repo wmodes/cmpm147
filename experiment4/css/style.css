@@ -22,3 +22,13 @@ body {
   display: flex;
   justify-content: space-between;
 }
+
+.showcase-img img {
+  width: 550px;
+  height: auto;
+}
+
+.two-columns {
+  display: flex;
+  gap: 20px;
+}
