@@ -48,9 +48,13 @@ function p3_drawTile(i, j) {
   noStroke();
 
   if (XXH.h32("tile:" + [i, j], worldSeed) % 4 == 0) {
-    fill(240, 200);
+    // fill(240, 200);
+    // lake blue
+    fill(156,175,216, 200);
   } else {
-    fill(255, 200);
+    // fill(255, 200);
+    // spring green
+    fill(67,113,64, 200);
   }
 
   push();
