@@ -4,7 +4,6 @@
 
 /* exported preload, setup, draw */
 /* global memory, dropper, restart, rate, slider, activeScore, bestScore, fpsCounter */
-/* global p4_inspirations, p4_initialize, p4_render, p4_mutate */
 
 let bestDesign;
 let currentDesign;
@@ -15,7 +14,6 @@ let currentInspirationPixels;
 
 function preload() {
   
-
   let allInspirations = getInspirations();
 
   for (let i = 0; i < allInspirations.length; i++) {
@@ -26,6 +24,7 @@ function preload() {
     option.innerHTML = insp.name;
     dropper.appendChild(option);
   }
+  
   dropper.onchange = e => inspirationChanged(allInspirations[e.target.value]);
   currentInspiration = allInspirations[0];
 

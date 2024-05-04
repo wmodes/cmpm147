@@ -18,21 +18,38 @@ body {
     height: 600px;
 }
 
-.results {
+.results-top, .controls {
   display: flex;
   flex-direction: row;
-  /* flex-wrap: wrap; */
   align-items: flex-end;
   gap: 20px;
 }
 
-.results > * {
-  flex-grow: 2; /* Makes each element grow equally to fill the container */
+.results-top .image-container p {
+  text-align: center;
 }
 
-.results > :last-child {
-  flex-grow: 1; /* Prevents the last child from growing and only takes up the space of its content */
+.results-top>* {
+  flex: 1;
 }
+
+.results-bottom p {
+  display: flex;
+  gap: 10px;
+  flex-direction: row;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.results-bottom p img {
+  width: 100px;
+  height: auto;
+}
+
+/* .results-bottom img {
+  width: 150px;
+  height: auto;
+} */
 
 .caption {
   text-align: center;
