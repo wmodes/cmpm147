@@ -17,3 +17,24 @@ body {
     width: 100%;
     height: 600px;
 }
+
+.results {
+  display: flex;
+  flex-direction: row;
+  /* flex-wrap: wrap; */
+  align-items: flex-end;
+  gap: 20px;
+}
+
+.results > * {
+  flex-grow: 2; /* Makes each element grow equally to fill the container */
+}
+
+.results > :last-child {
+  flex-grow: 1; /* Prevents the last child from growing and only takes up the space of its content */
+}
+
+.caption {
+  text-align: center;
+  font-size: 0.8em;
+}
