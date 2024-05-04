@@ -27,17 +27,19 @@ function getInspirations() {
 }
 
 function initDesign(inspiration) {
-  // add the original image to #original
-  $('#original').empty();
-  $('#original').append(`<img src="${inspiration.assetUrl}" alt="${inspiration.name}">`);
-
   // set the canvas size based on the container
   let canvasContainer = $('.image-container'); // Select the container using jQuery
-  let canvasWidth = canvasContainer.width() - 80; // Get the width of the container
+  let canvasWidth = canvasContainer.width(); // Get the width of the container
   let aspectRatio = inspiration.image.height / inspiration.image.width;
   let canvasHeight = canvasWidth * aspectRatio; // Calculate the height based on the aspect ratio
   resizeCanvas(canvasWidth, canvasHeight);
   $(".caption").text(inspiration.credit); // Set the caption text
+
+  // add the original image to #original
+  const imgHTML = `<img src="${inspiration.assetUrl}" style="width:${canvasWidth}px;">`
+  $('#original').empty();
+  $('#original').append(imgHTML);
+
   
   let design = {
     bg: 128,
